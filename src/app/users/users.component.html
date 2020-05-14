@@ -1,0 +1,148 @@
+<div class="container user-box">
+    <div style="width: 40%; display: inline-block;">
+        <h3>Usuarios</h3>
+        <p>Lorem ipsum</p>
+    </div>
+    <div style="width: auto; float: right; padding-top: 25px;display: flex;">
+        <button class="previsual-btn"><div class="eye-icon"></div><span style="">Previsualizar</span></button>
+        <button (click)="displayModal()" class="new-user-btn"> <img class="addIcon" src="/assets/add.svg" alt=""> Agregar nuevo usuario</button>
+    </div>
+</div>
+
+<div class="container main">
+    <div class="search-bar">
+        <!-- <img src="assets/search.svg" class="search-icon" alt="search"> -->
+        <input class="border-style search" type="text" placeholder="Búsqueda">
+        
+        <div class="border-style max-select">
+            <select class="custom-select" id="max-display" name="max-display">
+                <option value="1">8 por página</option>
+                <option value="2">10 por página</option>
+            </select>
+        </div>
+        <div class="border-style max-select">
+            <select class="custom-select" id="order-alphab" name="order-alphab">
+                <option value="1">Ordenar de A -Z</option>
+                <option value="2">Ordenar de Z - A</option>
+            </select>
+        </div>
+        <div class="border-style max-select">
+            <select class="custom-select" id="order-alphab" name="order-alphab">
+                <option value="1">Todos</option>
+                <option value="2">todos 2</option>
+            </select>
+        </div>
+        <div style="display: inline-block; margin-left: 3rem; vertical-align: middle;">
+            <div *ngIf="!listMode" (click)="changeView()" class="list-icon-inactive"></div>
+            <div *ngIf="listMode" class="list-icon-active"></div>
+            <div *ngIf="listMode" (click)="changeView()" class="card-icon-inactive"></div>
+            <div *ngIf="!listMode" class="card-icon-active"></div>
+        </div>
+    </div>
+
+    <ng-container *ngIf="!listMode">
+        <div *ngFor="let user of users;let i = index" style="display: inline-block;">
+            <div class="card">
+                <img class="round-img" [src]="user.picture">
+                <p>{{ user.name + ' ' + user.fathersLastName + ' ' + user.mothersLastName }}</p>
+                <p>{{ user.email }}</p>
+                <p>{{ getRole(user.roleId) }}</p>
+                <hr style="border: 1px solid #E9E9E9;">
+                <img (click)="changeStatus(i)" class="pointer align-left" *ngIf="!user.active" src="/assets/toggle_on.svg" alt="">
+                <img (click)="changeStatus(i)" class="pointer align-left" *ngIf="user.active" src="/assets/toggle_off.svg" alt="">
+                <div style="float: right;">
+                    <img (click)="editUser(i)" class="pointer" src="/assets/edit.png" alt="edit">
+                    <div (click)="removeUser(i)" class="trash-icon-active pointer"></div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+
+    <div *ngIf="listMode">
+        <table>
+            <tr>
+                <th></th>
+                <th>Foto</th>
+                <th>Nombre</th>
+                <th>Apellido paterno</th>
+                <th>Apellido materno</th>
+                <th>Correo</th>
+                <th>Rol</th>
+                <th>Status</th>
+                <th style="visibility: hidden;">Placeholder text</th>
+            </tr>
+            <tr *ngFor="let user of users;  let i = index" class="show">
+                <td><img src="/assets/points.svg"></td>
+                <td><img class="round-img" [src]="user.picture"></td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.fathersLastName }}</td>
+                <td>{{ user.mothersLastName  }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ getRole(user.roleId) }}</td>
+                <td>
+                    <img (click)="changeStatus(i)" class="pointer" *ngIf="!user.active" src="/assets/toggle_on.svg" alt="">
+                    <img (click)="changeStatus(i)" class="pointer" *ngIf="user.active" src="/assets/toggle_off.svg" alt="">
+                </td>
+                <td>
+                    <img (click)="editUser(i)" class="show-hover pointer" src="/assets/edit.png" alt="edit">
+                    <div (click)="removeUser(i)" class="trash-icon-active show-hover pointer"></div>
+                    <!-- <img src="/assets/web.svg" alt="">
+                    <img src="/assets/points.svg" alt="">
+                    <img src="/assets/trash.svg" alt="trash"> -->
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<button (click)="displayModal()" id="myBtn">Open Modal</button>
+
+<!-- The Modal -->
+<div *ngIf="showModal" id="myModal" class="modal">
+
+    <!-- Modal content -->
+    <div class="modal-content">
+        <div style="padding: 56px;">
+            <span (click)="hideModal()" class="close">&times;</span>
+            <p style="size: 20px">Agregar nuevo usuario</p>
+            
+            <div>
+                <p>Foto de perfil</p>
+                <br>
+                <div class="userIcon"></div>
+                <!-- <img src="/assets/user.svg" alt=""> -->
+                <div class="align-image-text">
+                    <p>JPG, PNG | Tamaño mínimo de 300px x 300px</p>
+                    <br>
+                    <button class="photo-upload-btn">Subir foto</button>
+                </div>
+            </div>
+        
+            <p>Información básica</p>
+            <form [formGroup]="userForm">
+                <input type="text" class="border-style input-style" placeholder="Nombre" formControlName="name">
+                <input type="text" class="border-style input-style" placeholder="Apellido paterno" formControlName="fathersLastName">
+                <input type="text" class="border-style input-style" placeholder="Apellido materno" formControlName="mothersLastName">
+                <input type="text" class="border-style input-style" placeholder="Correo electrónico" formControlName="email">
+                <select class="select-rol" name="rol" id="rol" formControlName="roleId">
+                    <option value="null" disabled="disabled">Rol</option>
+                    <option value="1">Dueño</option>
+                    <option value="2">Administrador</option>
+                    <option value="3">Staff</option>
+                </select>
+                <span style="padding-left: 30px;">Inactivo</span>
+                <img (click)="setStatus(true)" class="pointer form-switch" *ngIf="!this.userForm.get('active').value" src="/assets/toggle_on.svg" alt="">
+                <img (click)="setStatus(false)" class="pointer form-switch" *ngIf="this.userForm.get('active').value" src="/assets/toggle_off.svg" alt="">
+                <span>Activo</span>
+            </form>
+            
+        </div>
+        
+
+            <div class="submit-area">
+                <button (click)="saveForm()" style="float: right; margin-right: 30px;" class="save-btn">Guardar usuario</button>
+                <button (click)="hideModal()" class="cancel-btn">Cancelar</button>
+            </div>
+    </div>
+
+</div>
